@@ -1,8 +1,6 @@
 Config = {}
 
 -- General settings
-Config.Locale = 'en'
-Config.NotifyMethod = 'mythic' -- Options: 'ox', 'mythic'
 Config.Debug = false
 
 -- Enable or disable taxation types
