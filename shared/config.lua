@@ -3,7 +3,7 @@ Config = {}
 -- General settings
 Config.Debug = false
 
-Config.IncomeTaxInterval = 5000 -- Tax Collection interval in minutes
+Config.IncomeTaxInterval = 360 -- Tax Collection interval in minutes
 
 Config.TaxBrackets = {
     {threshold = 10000, rate = 5},  -- 5% tax for balances above 10,000

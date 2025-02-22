@@ -9,6 +9,7 @@ function RetrieveComponents()
     Jobs = exports["mythic-base"]:FetchComponent("Jobs")
 	Banking = exports["mythic-base"]:FetchComponent("Banking")
 	Execute = exports["mythic-base"]:FetchComponent("Execute")
+    Wallet = exports["mythic-base"]:FetchComponent("Wallet")
 end
 
 AddEventHandler('Core:Shared:Ready', function()
@@ -21,24 +22,28 @@ AddEventHandler('Core:Shared:Ready', function()
         "Fetch",
         "Jobs",
         "Banking",
-        "Execute"
+        "Execute",
+        "Wallet",
     }, function(error)
         if #error > 0 then return end
         RetrieveComponents()
     end)
 end)
 
-
-
+local playerID = 0 
 CreateThread(function()
     while true do
-        Citizen.Wait(Config.IncomeTaxInterval)
-        local player = Fetch:Source(1)
-        local char = player:GetData("Character")
-        local bankBal = char:GetData("BankAccount")
-        Execute:Client(1, "Notification", "Info", "Your Current Cash: $" .. bankBal)
+        Citizen.Wait(Config.IncomeTaxInterval * 60000)
 
-        -- Determine the highest applicable tax bracket
+        for _, src in ipairs(GetPlayers()) do
+            playerID = tonumber(src)
+        end
+
+        local player = Fetch:Source(playerID)
+        local char = player:GetData("Character")
+        local playerName = player:GetData("Name")
+        local bankAccount = Banking.Accounts:GetPersonal(char:GetData("SID")).Account
+        local bankBal = Banking.Balance:Get(bankAccount)
         local applicableRate = 0
         local applicableThreshold = 0
 
@@ -50,14 +55,29 @@ CreateThread(function()
         end
 
         if applicableRate > 0 then
-            print("Applying tax for threshold $" .. applicableThreshold .. " at rate " .. applicableRate .. "%")
-            bankBal = CalculateTax(bankBal, applicableRate)
+            local taxedAmount = CalculateTax(bankBal, applicableRate)
+
+            if Config.Debug then
+                Banking.Balance:Charge(bankAccount, taxedAmount, {
+                    type = "bill",
+                    title = "Income Tax",
+                    description = "You were taxed $"..taxedAmount.." by the government",
+                })
+                Execute:Client(playerID, "Notification", "Info", "You were taxed $"..taxedAmount.." by the government")
+                Logger:Info("fs_taxes", "["..playerID.."] - "..playerName.." - Taxed $"..taxedAmount.." at a rate of" .. applicableRate .. "%")
+            else
+                Banking.Balance:Charge(bankAccount, taxedAmount, {
+                    type = "bill",
+                    title = "Income Tax",
+                    description = "You were taxed $"..taxedAmount.." by the government",
+                })
+                Execute:Client(playerID, "Notification", "Info", "You were taxed $"..taxedAmount.." by the government")
+            end
         end
     end
 end)
 
 function CalculateTax(bankBal, rate)
     local taxedAmount = math.floor(bankBal * (rate / 100))
-    local updatedbankBal = bankBal - taxedAmount
-    return updatedbankBal
+    return taxedAmount
 end
