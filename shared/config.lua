@@ -3,8 +3,6 @@ Config = {}
 -- General settings
 Config.Debug = false
 
--- Enable or disable taxation types
-
 Config.IncomeTaxInterval = 5000 -- Tax Collection interval in minutes
 
 Config.TaxBrackets = {
