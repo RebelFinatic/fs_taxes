@@ -13,3 +13,7 @@ Config.TaxBrackets = {
     {threshold = 500000, rate = 25}, -- 25% tax for balances above 500,000
 }
 
+-- Whitelisted Accounts (These users won't be taxed)
+Config.TaxWhitelist = {
+    "655306"
+}

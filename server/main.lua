@@ -47,6 +47,13 @@ CreateThread(function()
         local applicableRate = 0
         local applicableThreshold = 0
 
+        if IsAccountWhitelisted(bankAccount) then
+            if Config.Debug then
+                Logger:Info("fs_taxes", "["..playerID.."] - "..playerName.." with bank account " .. bankAccount .. " is tax-exempt.")
+            end
+            return
+        end
+
         for k, v in pairs(Config.TaxBrackets) do
             if bankBal >= v.threshold and v.threshold > applicableThreshold then
                 applicableThreshold = v.threshold
@@ -56,6 +63,7 @@ CreateThread(function()
 
         if applicableRate > 0 then
             local taxedAmount = CalculateTax(bankBal, applicableRate)
+
 
             if Config.Debug then
                 Banking.Balance:Charge(bankAccount, taxedAmount, {
@@ -80,4 +88,13 @@ end)
 function CalculateTax(bankBal, rate)
     local taxedAmount = math.floor(bankBal * (rate / 100))
     return taxedAmount
+end
+
+function IsAccountWhitelisted(bankAccountId)
+    for _, id in ipairs(Config.TaxWhitelist) do
+        if tonumber(id) == bankAccountId then
+            return true
+        end
+    end
+    return false
 end

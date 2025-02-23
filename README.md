@@ -9,6 +9,7 @@
 - **Progressive Taxation:** Implements tax brackets, where higher bank balances are taxed at a higher rate.
 - **Automated Deductions:** Periodically deducts tax from players' bank accounts based on configurable time intervals.
 - **Configurable Tax Brackets:** Server owners can adjust tax thresholds and rates via configuration settings.
+- **Tax Exemptions:** Whitelist specific bank accounts to be exempt from taxes
 - **Notification System:** Players receive in-game notifications when taxes are deducted.
 - **Logging & Debugging:** Logs tax transactions for transparency and debugging purposes.
 
